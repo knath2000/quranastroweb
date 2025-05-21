@@ -1,0 +1,30 @@
+---
+import Background from '../components/Background.tsx';
+import VerseOfTheDay from '../components/VerseOfTheDay.tsx';
+import BottomNavigation from '../components/BottomNavigation.tsx';
+import '../styles/global.css'; // Import global styles
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" /> {/* Added viewport-fit=cover for edge-to-edge */}
+		<meta name="generator" content={Astro.generator} />
+		<title>Luminous Verses</title>
+		{/* Preconnects removed as fonts are local, ensure fonts.css is correctly loading them */}
+	</head>
+	<body class="relative min-h-screen overflow-hidden"> {/* Removed bg-background */}
+		<Background client:idle />
+		{/* Adjusted padding to account for new bottom nav height (60px) and safe areas */}
+		{/* Using env(safe-area-inset-bottom) for iOS safe area */}
+		<main class="relative z-10 flex flex-col items-center justify-center min-h-screen p-4 overflow-hidden" style="padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)); padding-top: env(safe-area-inset-top, 20px);">
+			{/* Typography and spacing adjusted to match screenshot */}
+			<h1 class="text-3xl font-englishBold text-textPrimary mb-6 text-center tracking-wide sm:text-4xl">
+				Luminous Verses
+			</h1>
+			<VerseOfTheDay client:visible />
+		</main>
+		<BottomNavigation client:load activeTab="home" /> {/* Changed to client:load for immediate JS for active state */}
+	</body>
+</html>

@@ -1,0 +1,25 @@
+---
+// src/pages/settings.astro
+import BottomNavigation from '../components/BottomNavigation.tsx';
+import Background from '../components/Background.tsx';
+import SettingsPanel from '../components/SettingsPanel.tsx';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Settings | Quran Expo</title>
+  </head>
+  <body class="flex flex-col min-h-screen overflow-hidden">
+    <Background />
+
+    <main class="container mx-auto px-4 pt-6 relative z-10 flex-1" style="padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));">
+      <h1 class="text-2xl font-englishBold text-textPrimary mb-6">Settings</h1>
+      
+      <SettingsPanel client:only="preact" />
+    </main>
+    
+    <BottomNavigation client:visible activeTab="settings" />
+  </body>
+</html>

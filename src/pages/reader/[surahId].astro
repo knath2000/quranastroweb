@@ -1,0 +1,56 @@
+---
+import Background from '../../components/Background.tsx';
+import ReaderContainer from '../../components/ReaderContainer.tsx';
+import '../../styles/global.css';
+
+// This function is required for all dynamic routes in Astro when using static site generation (SSG)
+export async function getStaticPaths() {
+  // Generate paths for all 114 Surahs in the Quran
+  return Array.from({ length: 114 }, (_, i) => ({
+    params: { surahId: String(i + 1) },
+  }));
+}
+
+// Get the surahId from the URL parameters
+const { surahId } = Astro.params;
+const numericSurahId = parseInt(surahId || '1', 10);
+
+// Validate the surahId
+const isValidSurahId = !isNaN(numericSurahId) && numericSurahId >= 1 && numericSurahId <= 114;
+
+// Initialize pageTitle
+let pageTitle = "Quran Reader";
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{pageTitle} - Luminous Verses</title>
+	</head>
+	<body class="flex flex-col h-screen overflow-hidden">
+		<!-- Background with stars and gradient -->
+		<Background client:idle />
+		
+		<!-- Main content area -->
+		{/* Adjusted padding to account for bottom nav height (60px) and safe areas */}
+		{/* Using env(safe-area-inset-bottom) for iOS safe area */}
+		<main class="relative z-10 flex flex-col items-center flex-1 px-4 pt-4 h-full overflow-hidden" style="padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)); padding-top: env(safe-area-inset-top, 20px);">
+			<div class="w-full max-w-3xl relative flex flex-col h-full">
+				{isValidSurahId ? (
+					<ReaderContainer client:visible surahId={numericSurahId} />
+				) : (
+					<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded mb-4">
+						<p>Invalid Surah ID: {surahId}. Please enter a number between 1 and 114.</p>
+						<a href="/surahs" class="mt-3 inline-block bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-4 rounded text-sm">
+							Go to Surah List
+						</a>
+					</div>
+				)}
+			</div>
+		</main>
+		
+	</body>
+</html>

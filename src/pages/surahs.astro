@@ -1,0 +1,26 @@
+---
+import Background from '../components/Background.tsx';
+import BottomNavigation from '../components/BottomNavigation.tsx';
+import SurahListContainer from '../components/SurahListContainer.tsx';
+import '../styles/global.css'; // Import global styles
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" /> <!-- viewport-fit=cover for edge-to-edge -->
+		<meta name="generator" content={Astro.generator} />
+		<title>Surahs - Luminous Verses</title>
+	</head>
+	<body class="flex flex-col h-screen overflow-hidden"> {/* Restored overflow-hidden to lock page scroll */}
+		<Background client:idle />
+		{/* Main content area with proper spacing for the bottom navigation */}
+		<main class="relative z-10 flex flex-col items-center flex-1 p-4 h-full overflow-hidden" style="padding-top: env(safe-area-inset-top, 20px);">
+			<div class="w-full max-w-md absolute inset-x-0 top-[20px] bottom-[60px] mx-auto">
+				<SurahListContainer client:only="preact" />
+			</div>
+		</main>
+		<BottomNavigation client:load activeTab="surahs" /> <!-- Added activeTab prop -->
+	</body>
+</html>

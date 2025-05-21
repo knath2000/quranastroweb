@@ -1,0 +1,11 @@
+@import "./fonts.css"; /* Import custom fonts */
+@import "./audio-player.css"; /* Import audio player styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-skyDeepBlue text-textPrimary font-englishRegular; /* Replaced bg-background with bg-skyDeepBlue */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
