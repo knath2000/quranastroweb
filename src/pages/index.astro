@@ -1,8 +1,7 @@
 ---
 import Background from '../components/Background.tsx';
 import VerseOfTheDay from '../components/VerseOfTheDay.tsx';
-import BottomNavigation from '../components/BottomNavigation.tsx';
-import '../styles/global.css'; // Import global styles
+import '../styles/global.css'; // Importar estilos globales
 ---
 
 <html lang="en">
@@ -18,13 +17,17 @@ import '../styles/global.css'; // Import global styles
 		<Background client:idle />
 		{/* Adjusted padding to account for new bottom nav height (60px) and safe areas */}
 		{/* Using env(safe-area-inset-bottom) for iOS safe area */}
-		<main class="relative z-10 flex flex-col items-center justify-center min-h-screen p-4 overflow-hidden" style="padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)); padding-top: env(safe-area-inset-top, 20px);">
-			{/* Typography and spacing adjusted to match screenshot */}
-			<h1 class="text-3xl font-englishBold text-textPrimary mb-6 text-center tracking-wide sm:text-4xl">
+		<main class="relative z-10 flex flex-col items-center justify-center min-h-screen p-4 overflow-hidden" style="padding-bottom: env(safe-area-inset-bottom, 0px); padding-top: env(safe-area-inset-top, 20px);">
+			<h1 class="text-3xl font-englishBold text-textPrimary mb-6 text-center tracking-wide sm:text-4xl animate-sequence-1">
 				Luminous Verses
 			</h1>
-			<VerseOfTheDay client:visible />
+			<div class="animate-sequence-2">
+				<VerseOfTheDay client:visible />
+			</div>
+			<a href="/surahs" 
+			   class="mt-8 px-6 py-3 bg-primary text-white font-bold rounded-full shadow-lg hover:bg-primary-dark transition-colors duration-300 ease-in-out text-lg animate-sequence-3">
+				Abrir Corán
+			</a>
 		</main>
-		<BottomNavigation client:load activeTab="home" /> {/* Changed to client:load for immediate JS for active state */}
 	</body>
 </html>

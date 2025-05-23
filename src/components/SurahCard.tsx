@@ -23,7 +23,7 @@ const SurahCard = ({ surah, onPress, className = '' }: SurahCardProps) => {
       className={`relative flex flex-row items-center overflow-hidden p-4 mb-3 rounded-xl cursor-pointer ${className}`}
     >
       {/* Glassmorphism effect */}
-      <div className="absolute inset-0 bg-skyPurple/60 backdrop-blur-xl border border-white/10 rounded-xl"></div>
+      <div className="absolute inset-0 glassmorphism"></div>
       
       {/* Number circle */}
       <div className="relative z-10 bg-desertHighlightGold rounded-full w-10 h-10 flex justify-center items-center mr-4">

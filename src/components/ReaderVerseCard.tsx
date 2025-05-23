@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import { useState, useEffect } from 'preact/hooks';
 import type { Verse } from '../types/quran';
 import { ErrorIcon } from './icons/AudioIcons';
 
@@ -12,11 +13,11 @@ interface ReaderVerseCardProps {
   onAudioPress?: () => void;
   currentTime?: number;
   duration?: number;
-  onSeek?: (time: number) => void;
+  onSeek?: (event: Event) => void;
   className?: string;
 }
 
-const ReaderVerseCard = ({
+export const ReaderVerseCard = ({
   verse,
   showTranslation = true,
   isActiveAudio = false,
@@ -28,29 +29,29 @@ const ReaderVerseCard = ({
   duration = 0,
   onSeek = () => {},
 }: ReaderVerseCardProps) => {
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+  };
+
   // Calculate class names for the verse card
   const getCardClassNames = () => {
-    const baseClasses = "relative flex flex-row items-start overflow-hidden p-4 mb-3 rounded-xl cursor-pointer bg-skyPurple/60 backdrop-blur-xl border border-white/10";
+    const baseClasses = "relative flex flex-row items-start overflow-hidden p-4 mb-3 rounded-xl cursor-pointer bg-skyPurple/60 backdrop-blur-xl border border-white/10 transition-all duration-300 ease-in-out";
     
     if (isActiveAudio) {
+      // Aplica el borde de gradiente animado cuando el audio está activo
+      let activeClasses = `${baseClasses} verse-border-gradient-flow`;
       if (isLoadingAudio) {
-        return `${baseClasses} verse-audio-active verse-audio-loading`;
+        return `${activeClasses} verse-audio-loading`;
       } else if (isPlayingAudio) {
-        return `${baseClasses} verse-audio-active verse-audio-playing`;
+        return `${activeClasses} verse-audio-playing`;
       } else {
-        return `${baseClasses} verse-audio-active`;
+        return `${activeClasses}`;
       }
     }
     
     return baseClasses;
-  };
-
-  const formatTime = (seconds: number): string => {
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60)
-      .toString()
-      .padStart(2, '0');
-    return `${m}:${s}`;
   };
 
   return (
@@ -59,7 +60,7 @@ const ReaderVerseCard = ({
       onClick={onAudioPress}
     >
       {/* Glassmorphism overlay */}
-      <div className="absolute inset-0 bg-skyPurple/60 backdrop-blur-xl rounded-xl z-0"></div>
+      <div className="absolute inset-0 glassmorphism z-0"></div>
       
       {/* Verse number in circle */}
       <div className="relative z-10 bg-desertHighlightGold rounded-full w-9 h-9 flex justify-center items-center mr-4 flex-shrink-0">
@@ -69,7 +70,7 @@ const ReaderVerseCard = ({
       </div>
       
       {/* Text container */}
-      <div className="relative z-10 flex-1">
+      <div className={`relative z-10 flex-1 ${isPlayingAudio ? 'verse-body-gradient-shift' : ''}`}>
         {/* Arabic text */}
         <p
           className="text-textArabic font-arabicRegular text-xl text-right mb-2 leading-relaxed"
@@ -84,6 +85,32 @@ const ReaderVerseCard = ({
             {verse.translation}
           </p>
         )}
+
+        {isActiveAudio && (
+          <div className="w-full flex items-center space-x-2 mt-2">
+            <span className="text-xs text-textSecondary bg-skyDeepBlue/40 px-1 rounded">{formatTime(currentTime)}</span>
+            <input
+              type="range"
+              min="0"
+              max={duration}
+              value={currentTime} // Usar currentTime directamente
+              onInput={onSeek} // Pasar el evento al handler del hook para la lógica de seek
+              className="flex-1 h-1 bg-skyIndigo/50 rounded-lg appearance-none cursor-pointer range-sm"
+              style={{
+                background: `linear-gradient(to right, var(--tw-colors-desertWarmOrange) ${((currentTime / duration) * 100) || 0}%, var(--tw-colors-desertHighlightGold) ${((currentTime / duration) * 100) || 0}%)`,
+                WebkitAppearance: 'none',
+                MozAppearance: 'none',
+                appearance: 'none',
+                outline: 'none',
+                height: '8px', /* Make it a bit thicker */
+                borderRadius: '9999px', /* Fully rounded */
+                boxShadow: '0 0 0 2px rgba(255, 255, 255, 0.2)', /* Subtle white border/glow */
+                transition: 'background 0.1s linear', // Transición suave para el fondo del slider
+              }}
+            />
+            <span className="text-xs text-textSecondary bg-skyDeepBlue/40 px-1 rounded">{formatTime(duration)}</span>
+          </div>
+        )}
         
         {/* Error indicator (only if there's an error and this verse is active) */}
         {isActiveAudio && audioError && (
@@ -92,27 +119,7 @@ const ReaderVerseCard = ({
             <span>Error playing audio</span>
           </div>
         )}
-
-        {/* Playback slider */}
-        {isActiveAudio && duration > 0 && (
-          <div className="mt-3 z-10">
-            <input
-              type="range"
-              min={0}
-              max={duration}
-              value={currentTime}
-              onInput={e => onSeek(Number((e.target as HTMLInputElement).value))}
-              className="w-full"
-            />
-            <div className="flex justify-between text-xs text-textSecondary mt-1">
-              <span>{formatTime(currentTime)}</span>
-              <span>{formatTime(duration)}</span>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
 };
-
-export default ReaderVerseCard;

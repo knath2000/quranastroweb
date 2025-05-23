@@ -181,10 +181,6 @@ Writing clean, maintainable code is a fundamental skill:
 
 **Formatting**: Follow consistent formatting conventions. Use automated tools to enforce style rules and eliminate debates about formatting.
 
-### 4.1.6 Manejo de Estado y Ciclo de Vida de Componentes
-
-**Inicialización de Hooks y Variables Derivadas**: Asegurarse de que las variables derivadas de los hooks se calculen solo después de que los hooks hayan sido completamente inicializados. Utilizar `useMemo` para valores derivados y añadir verificaciones de `null` o `undefined` para manejar estados no inicializados, previniendo errores de "Cannot access before initialization".
-
 ### 4.2 Code Organization
 
 Structure your codebase for clarity and maintainability:

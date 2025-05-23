@@ -2,24 +2,14 @@
 import { defineConfig } from 'astro/config';
 
 import preact from '@astrojs/preact';
-import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind'; // Re-enable Astro Tailwind integration
 
 // https://astro.build/config
 export default defineConfig({
   integrations: [
-    // Configurar React para los componentes específicos
-    react({
-      include: ['**/ReactSurahCard.tsx', '**/SurahListContainer.tsx'],
-      // Asegurarse de que React no procese otros componentes
-      exclude: ['**/*.tsx']
-    }),
-    
-    // Configurar Preact para el resto de componentes
+    // Configurar Preact para todos los componentes TSX
     preact({
-      // Asegurarse de que Preact no procese los componentes React
-      include: ['**/*.tsx'],
-      exclude: ['**/ReactSurahCard.tsx', '**/SurahListContainer.tsx']
+      include: ['**/*.tsx']
     }),
     
     tailwind()

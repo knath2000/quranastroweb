@@ -134,7 +134,7 @@ const VerseOfTheDay = () => {
         {/* Enhanced Glassmorphism container */}
         <div class="w-full max-w-md p-6 rounded-xl shadow-xl relative overflow-hidden mx-auto"> {/* Added mx-auto here */}
           {/* Backdrop blur layer */}
-          <div class="absolute inset-0 bg-skyPurple/60 backdrop-blur-xl border border-white/10 rounded-xl"></div>
+          <div class="absolute inset-0 glassmorphism"></div>
 
           {/* Content - ensure it's above the blur layer */}
           <div class="relative z-10">

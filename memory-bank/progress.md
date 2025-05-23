@@ -1,112 +1,39 @@
-# Progress: Quran Expo Web App
+# progress.md
 
-## Project Status: Initial Development
+## Qué funciona
+- El efecto de glasmorfismo se ha aplicado correctamente a las tarjetas (`VerseOfTheDay.tsx`, `SurahCard.tsx`, `ReaderVerseCard.tsx`).
+- El componente `AudioControlsPopup.tsx` ha sido creado e integrado en `ReaderContainer.tsx`.
+- El servidor de desarrollo se inicia correctamente sin errores de renderizado.
+- El componente `BottomNavigation.tsx` ha sido completamente eliminado del código base.
+- La funcionalidad del `AudioControlsPopup` en la página del lector ha sido verificada y funciona correctamente.
+- **El `AudioControlsPopup.tsx` ha sido modificado para estar fijo en la parte inferior central de la página y tiene un fondo blanco plateado cromado.**
+- **El `AudioControlsPopup.tsx` ha sido mejorado visualmente para incluir información contextual del verso actual (nombre de la Surah, número de verso) y un diseño glassmorphism más refinado, siguiendo las mejores prácticas de UI.**
+- **La lógica de `useVersePlayer.ts` ha sido ajustada para que el slider de audio se actualice correctamente con la reproducción, utilizando el evento `timeupdate` como mecanismo principal.**
+- **El botón de retroceso (`BackButton.tsx`) ahora utiliza `history.back()` para una navegación correcta.**
+- **La lógica de reproducción de audio en `useVersePlayer.ts` ha sido refactorizada para mejorar la fluidez, incluyendo:**
+-     **Implementación del patrón Audio Pool para reutilización de instancias de audio.**
+-     **Unificación del estado de audio con `useReducer`.**
+-     **Optimización de la gestión de event listeners con `useAudioEventManager`.**
+-     **Implementación de Preloading Inteligente para el siguiente verso.**
+-     **Implementación de Transiciones Suaves (Crossfade) entre versos.**
 
-**Current Phase:** Planning and Homepage Implementation  
-**Overall Progress:** 10%
+## Qué queda por construir
+- Verificar la navegación entre páginas (`/`, `/surahs`, `/reader/[surahId]`) sin la barra de navegación inferior.
+- Verificar visualmente el nuevo posicionamiento y estilo del `AudioControlsPopup` en el navegador.
 
-## Completed Features
+## Estado actual
+- La integración, verificación y estilización del `AudioControlsPopup` están completas.
+- El problema de renderizado de `BottomNavigation` en el servidor de Astro se ha resuelto al eliminar el componente.
+- La sincronización del slider de audio ha sido corregida.
+- La funcionalidad del botón de retroceso ha sido verificada y funciona correctamente.
+- **La refactorización de la lógica de reproducción de audio en `useVersePlayer.ts` está completa, mejorando la fluidez y el rendimiento.**
+- El siguiente paso es verificar la navegación general de la aplicación y la apariencia del popup de audio.
 
-1. **Project Setup**
-   - ✅ Astro framework installation and configuration
-   - ✅ Preact integration
-   - ✅ TailwindCSS setup and configuration
-   - ✅ TypeScript configuration
-   - ✅ Project documentation in Memory Bank
+## Problemas conocidos
+- Ninguno actualmente.
 
-2. **Homepage Development - Debugging Cleanup**
-   - ✅ Removed all "red line" debug elements from the codebase.
-
-3. **UI Enhancements**
-   - ✅ Made the bottom navigation bar background transparent.
-
-## Currently In Progress
-
-1. **Homepage Development**
-   - 🔄 Analysis of native app homepage design
-   - 🔄 Planning component structure
-   - 🔄 Creating visual UI components with placeholder data
-
-## Next Up
-
-1. **Homepage Implementation**
-   - Background component
-   - Header and navigation elements
-   - Verse of the Day display
-   - Feature/category cards
-   - Bottom navigation bar
-
-2. **Surah Listing Page**
-   - Surah list view
-   - Search/filter functionality
-   - Surah details display
-   - Navigation to reader
-
-3. **Reader Page**
-   - Verse display with Arabic text and translation
-   - Audio playback functionality
-   - Navigation between verses and surahs
-   - Visual feedback for audio playback
-
-## Status by Component
-
-| Component | Status | Notes |
-|-----------|--------|-------|
-| Background | Not Started | Need to analyze native app design |
-| Header | Not Started | Need to analyze native app design |
-| Verse of the Day | Not Started | Need placeholder data structure |
-| Feature Cards | Not Started | Need to identify card types from screenshots |
-| Bottom Navigation | Not Started | Need to determine nav items from native app |
-| Surah List | Not Started | Will be implemented after homepage |
-| Reader | Not Started | Will be implemented after Surah List |
-
-## Known Issues
-
-1. No known issues yet as the project is in initial planning phase.
-
-## Technical Debt
-
-1. Need to establish a standardized approach for handling responsive design across components.
-2. Need to create a comprehensive theming system that matches the native app's color scheme.
-3. Need to determine audio loading and management strategy.
-
-## Milestones
-
-| Milestone | Target Date | Status |
-|-----------|-------------|--------|
-| Project Setup | Completed | ✅ |
-| Homepage Implementation | In Progress | 🔄 |
-| Surah List Page | Not Started | ⏱️ |
-| Reader Basic Functionality | Not Started | ⏱️ |
-| Audio Integration | Not Started | ⏱️ |
-| MVP Release | Not Scheduled | ⏱️ |
-
-## Current Focus Areas
-
-1. **Design Analysis**
-   - Analyze screenshots of the native app
-   - Identify all UI components and their relationships
-   - Document design patterns and visual elements
-
-2. **Component Architecture**
-   - Define component hierarchy
-   - Create TypeScript interfaces for component props
-   - Establish design patterns for component composition
-
-3. **Visual Implementation**
-   - Create base UI components
-   - Implement responsive layouts
-   - Apply styling to match native app
-
-## Blocking Issues
-
-1. Need screenshots of the native iOS app homepage to proceed with accurate implementation.
-2. Need information about the API structure used by the native app.
-
-## Completed Work Log
-
-| Date | Description |
-|------|-------------|
-| Current | Initial project setup and documentation |
-| 2025-05-21 | Removed all "red line" debug elements from the codebase. |
-| 2025-05-21 | Made the bottom navigation bar background transparent. |
+## Evolución de las decisiones del proyecto
+- Se decidió eliminar la barra de navegación inferior para simplificar la interfaz y resolver problemas de renderizado en SSR de Astro.
+- Se ha priorizado la integración y verificación del popup de audio para mejorar la experiencia del usuario en la página del lector, incluyendo su posicionamiento y estilo.
+- Se ha refactorizado la lógica de `useVersePlayer.ts` para usar el evento `timeupdate` para una sincronización más fiable del slider de audio.
+- Se ha modificado el botón de retroceso para usar `history.back()` para una navegación más intuitiva.

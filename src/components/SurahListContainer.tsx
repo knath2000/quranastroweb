@@ -3,7 +3,6 @@ import { useState, useEffect } from 'preact/hooks';
 import type { Surah } from '../types/quran';
 import ReactSurahCard from './ReactSurahCard';
 import { fetchSurahList } from '../services/apiClient';
-
 // Versión simplificada sin virtualización
 const SurahListContainer = () => {
   const [surahs, setSurahs] = useState<Surah[]>([]);
@@ -67,7 +66,7 @@ const SurahListContainer = () => {
     <div className="w-full flex flex-col h-full">
       <div className="relative flex-1 w-full">
       {/* Lista normal sin virtualización */}
-      <div className="absolute inset-x-0 top-[0px] bottom-[20px] overflow-y-auto space-y-4 z-10">
+      <div className="absolute inset-x-0 top-[0px] bottom-[20px] overflow-y-auto space-y-4 z-10 scrollbar-hide">
         <h1 className="text-3xl font-englishBold text-textPrimary mb-6 text-center tracking-wide">
           Surahs
         </h1>
@@ -78,13 +77,14 @@ const SurahListContainer = () => {
         </div>
         
         <div className="space-y-4">
-          {surahs.map((surah) => (
-            <ReactSurahCard
-              key={surah.number}
-              surah={surah}
-              onPress={handleSurahPress}
-              className=""
-            />
+          {surahs.map((surah, index) => (
+            <div key={surah.number} className={`animate-list-item animate-item-${Math.min(index, 19)}`}>
+              <ReactSurahCard
+                surah={surah}
+                onPress={handleSurahPress}
+                className=""
+              />
+            </div>
           ))}
         </div>
         

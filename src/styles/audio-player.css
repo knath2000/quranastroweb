@@ -18,6 +18,7 @@ input[type=range]::-webkit-slider-runnable-track {
     rgba(255, 207, 123, 0.8) var(--range-progress, 0%), 
     rgba(255, 255, 255, 0.1) var(--range-progress, 0%)
   );
+  transition: background 0.15s ease;
 }
 
 /* Track - Firefox */
@@ -25,6 +26,7 @@ input[type=range]::-moz-range-track {
   height: 6px;
   border-radius: 3px;
   background: rgba(255, 255, 255, 0.1);
+  transition: background 0.15s ease;
 }
 
 /* Progress - Firefox */
@@ -32,6 +34,7 @@ input[type=range]::-moz-range-progress {
   height: 6px;
   border-radius: 3px;
   background: rgba(255, 207, 123, 0.8);
+  transition: width 0.15s ease, background 0.15s ease;
 }
 
 /* Thumb - Chrome/Safari */
@@ -46,6 +49,7 @@ input[type=range]::-webkit-slider-thumb {
   margin-top: -4px; /* Centers the thumb on the track */
   border: none;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 /* Thumb - Firefox */
@@ -57,6 +61,7 @@ input[type=range]::-moz-range-thumb {
   cursor: pointer;
   border: none;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 /* Focus styles */
@@ -127,4 +132,30 @@ input[type=range]:hover::-webkit-slider-thumb {
 
 input[type=range]:hover::-moz-range-thumb {
   background: #FFD990; /* Lighter version of desertHighlightGold */
+}
+
+/* Custom slider styles */
+.custom-slider {
+  touch-action: none; /* Prevents scrolling when interacting with the slider on touch devices */
+}
+
+.custom-slider-thumb {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  z-index: 10;
+  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease, left 0.15s linear;
+}
+
+.custom-slider-thumb:hover {
+  background: #FFD990; /* Lighter version of desertHighlightGold */
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.custom-slider-thumb:active {
+  transform: translate(-50%, -50%) scale(1.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.custom-slider-fill {
+  transition: width 0.15s linear;
 }

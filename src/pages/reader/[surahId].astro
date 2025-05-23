@@ -1,6 +1,7 @@
 ---
 import Background from '../../components/Background.tsx';
 import ReaderContainer from '../../components/ReaderContainer.tsx';
+import BackButton from '../../components/BackButton.tsx'; // Importar BackButton
 import '../../styles/global.css';
 
 // This function is required for all dynamic routes in Astro when using static site generation (SSG)
@@ -37,12 +38,17 @@ let pageTitle = "Quran Reader";
 		<!-- Main content area -->
 		{/* Adjusted padding to account for bottom nav height (60px) and safe areas */}
 		{/* Using env(safe-area-inset-bottom) for iOS safe area */}
-		<main class="relative z-10 flex flex-col items-center flex-1 px-4 pt-4 h-full overflow-hidden" style="padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)); padding-top: env(safe-area-inset-top, 20px);">
+		<main class="relative z-10 flex flex-col items-center flex-1 px-4 pt-4 h-full overflow-hidden" style="padding-bottom: env(safe-area-inset-bottom, 0px); padding-top: env(safe-area-inset-top, 20px);">
 			<div class="w-full max-w-3xl relative flex flex-col h-full">
+        <div class="opacity-0 animate-fade-in animation-delay-[100ms] z-20 relative">
+          <BackButton client:visible />
+        </div>
 				{isValidSurahId ? (
-					<ReaderContainer client:visible surahId={numericSurahId} />
+					<div class="h-full">
+						<ReaderContainer client:visible surahId={numericSurahId} />
+					</div>
 				) : (
-					<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded mb-4">
+					<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded mb-4 opacity-0 animate-fade-in animation-delay-[100ms]">
 						<p>Invalid Surah ID: {surahId}. Please enter a number between 1 and 114.</p>
 						<a href="/surahs" class="mt-3 inline-block bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-4 rounded text-sm">
 							Go to Surah List
@@ -51,6 +57,5 @@ let pageTitle = "Quran Reader";
 				)}
 			</div>
 		</main>
-		
 	</body>
 </html>

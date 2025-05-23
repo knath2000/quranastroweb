@@ -76,17 +76,48 @@ export default {
       },
       animation: {
         'twinkle': 'twinkle 4s ease-in-out infinite',
+        'fade-in': 'fadeIn 1s ease-out forwards',
+        'slide-in-top': 'slideInFromTop 1s ease-out forwards',
       },
       keyframes: {
         twinkle: {
           '0%, 100%': { opacity: 0.2 },
           '50%': { opacity: 1 },
-        }
-      }
-      // For glassmorphism, we'll use backdrop-filter utilities
-      // which are enabled by default in Tailwind CSS v3.0+
-      // We can apply them directly in components, e.g. backdrop-blur-md bg-opacity-50
+        },
+        fadeIn: {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+        slideInFromTop: {
+          from: { opacity: '0', transform: 'translateY(-20px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
+      backdropFilter: {
+        'none': 'none',
+        'xs': 'blur(2px)',
+        'sm': 'blur(4px)',
+        'md': 'blur(8px)',
+        'lg': 'blur(12px)',
+        'xl': 'blur(16px)',
+        '2xl': 'blur(24px)',
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    function({ addUtilities }) {
+      const newUtilities = {
+        '.glassmorphism': {
+          '@apply bg-skyPurple/60 backdrop-blur-xl border border-white/10 rounded-xl': {},
+        },
+        '.glassmorphism-light': {
+          '@apply bg-skyPurple/40 backdrop-blur-lg border border-white/10 rounded-xl': {},
+        },
+        '.glassmorphism-strong': {
+          '@apply bg-skyPurple/70 backdrop-blur-2xl border border-white/20 rounded-xl': {},
+        },
+      }
+      addUtilities(newUtilities)
+    }
+  ],
 };

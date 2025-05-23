@@ -1,15 +1,14 @@
 import { h } from 'preact';
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useState, useMemo } from 'preact/hooks'; // Importar useMemo
 import { fetchSurahById, fetchVersesForSurah } from '../services/apiClient';
 import type { Surah, Verse } from '../types/quran';
 import ReaderSurahHeader from './ReaderSurahHeader';
-import ReaderVerseCard from './ReaderVerseCard';
+import { ReaderVerseCard } from './ReaderVerseCard';
 import { useVersePlayer } from '../hooks/useVersePlayer';
 import { getVerseKey } from '../utils/audioUtils';
-import { useStore } from '@nanostores/preact'; // Import useStore
+import { useStore } from '@nanostores/preact';
 import { showTranslation, audioActive } from '../stores/settingsStore';
-import { SkipIcon, StopIcon } from './icons/AudioIcons'; // Importar los nuevos iconos
-import BottomNavigation from './BottomNavigation'; // Importar BottomNavigation
+import AudioControlsPopup from './AudioControlsPopup';
 
 interface ReaderContainerProps {
   surahId: number;
@@ -24,22 +23,31 @@ const ReaderContainer = ({ surahId }: ReaderContainerProps) => {
   // Use showTranslation from the store
   const $showTranslation = useStore(showTranslation);
 
-  // Audio player state and functions, pass verses to the hook
+  // Audio player state and functions
   const {
-    isPlaying,
-    isLoading: isLoadingAudio,
+    status,
     error: audioError,
     currentVerseKey,
-    toggleVerseAudio,
-    stopAndUnload, // Obtener stopAndUnload del hook
+    togglePlayPause,
+    stopAndUnload,
     duration,
     currentTime,
     seek,
     setVerseIndex,
     skipToNextVerse,
+    onSeekChange,
+    playVerse,
   } = useVersePlayer(verses);
 
-  const $audioActive = useStore(audioActive); // Get audioActive from the store
+  const isPlaying = status === 'playing';
+  const isLoadingAudio = status === 'loading';
+  const $audioActive = useStore(audioActive);
+
+  // Obtener el verso actual de forma segura usando useMemo
+  const currentVerse = useMemo(() => {
+    if (!verses || !currentVerseKey) return null;
+    return verses.find(v => getVerseKey(v.surahId, v.numberInSurah) === currentVerseKey);
+  }, [verses, currentVerseKey]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -80,11 +88,12 @@ const ReaderContainer = ({ surahId }: ReaderContainerProps) => {
       setError('Invalid Surah ID. Please enter a number between 1 and 114.');
       setLoading(false);
     }
-  }, [surahId, stopAndUnload]);
+  }, [surahId]);
 
   // Handler for verse audio toggle
   const handleVerseAudioToggle = (verse: Verse) => {
     console.log('Handling audio toggle for verse:', verse.surahId, verse.numberInSurah);
+    
     // Find the index of the verse being played and set it in the hook
     const index = verses.findIndex(v =>
       v.surahId === verse.surahId && v.numberInSurah === verse.numberInSurah
@@ -93,9 +102,31 @@ const ReaderContainer = ({ surahId }: ReaderContainerProps) => {
     if (index !== -1) {
       setVerseIndex(index);
       console.log('Found verse index:', index);
+      
+      // Verificar si este verso ya es el verso activo
+      const verseKey = getVerseKey(verse.surahId, verse.numberInSurah);
+      const isCurrentVerse = verseKey === currentVerseKey;
+      
+      console.log('Estado de audio antes de toggle:', {
+        verseKey,
+        currentVerseKey,
+        isCurrentVerse,
+        status,
+        audioActive: $audioActive
+      });
+      
+      // Si no es el verso actual, reproducir directamente en lugar de toggle
+      if (!isCurrentVerse) {
+        console.log('Reproduciendo nuevo verso directamente:', verseKey);
+        playVerse(verse.surahId, verse.numberInSurah);
+      } else {
+        // Si es el verso actual, alternar reproducción/pausa
+        console.log('Alternando reproducción para verso actual:', verseKey);
+        togglePlayPause();
+      }
+    } else {
+      console.error('No se pudo encontrar el índice del verso:', verse);
     }
-
-    toggleVerseAudio(verse.surahId, verse.numberInSurah);
   };
 
   if (loading) {
@@ -149,57 +180,45 @@ const ReaderContainer = ({ surahId }: ReaderContainerProps) => {
   return (
     <div className="w-full flex flex-col relative h-full">
       {/* Scrollable container for verses */}
-      <div className={`absolute inset-x-0 top-[0px] overflow-y-auto space-y-4 z-10 ${$audioActive ? 'bottom-[60px]' : 'bottom-[60px]'}`}>
-        <ReaderSurahHeader surah={surah} />
-        {verses.map((verse) => {
+      <div className="absolute inset-x-0 top-0 overflow-y-auto space-y-4 z-10 bottom-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <div className="opacity-0 animate-fade-in animation-delay-[100ms]">
+          <ReaderSurahHeader surah={surah} />
+        </div>
+        {verses.map((verse, index) => {
           const verseKey = getVerseKey(verse.surahId, verse.numberInSurah);
           const isActiveAudio = currentVerseKey === verseKey;
 
           return (
-            <ReaderVerseCard
-              key={verse.id}
-              verse={verse}
-              showTranslation={$showTranslation}
-              isActiveAudio={isActiveAudio}
-              isPlayingAudio={isActiveAudio && isPlaying}
-              isLoadingAudio={isActiveAudio && isLoadingAudio}
-              audioError={isActiveAudio ? audioError : null}
-              currentTime={isActiveAudio ? currentTime : 0}
-              duration={isActiveAudio ? duration : 0}
-              onSeek={(time: number) => seek(time)}
-              onAudioPress={() => handleVerseAudioToggle(verse)}
-              className="last:mb-0"
-            />
+            <div key={verse.id} className={`animate-list-item animate-item-${Math.min(index, 19)}`}>
+              <ReaderVerseCard
+                verse={verse}
+                showTranslation={$showTranslation}
+                isActiveAudio={isActiveAudio}
+                isPlayingAudio={isActiveAudio && isPlaying}
+                isLoadingAudio={isLoadingAudio}
+                audioError={audioError}
+                onAudioPress={() => handleVerseAudioToggle(verse)}
+                currentTime={currentTime}
+                duration={duration}
+                onSeek={onSeekChange}
+                className="last:mb-0"
+              />
+            </div>
           );
         })}
         {/* Extra padding at the bottom to ensure last item is fully visible */}
         <div className="h-4"></div>
       </div>
-
-      {/* Controles de audio (Stop y Skip) */}
-      {$audioActive && (
-        <div className="fixed bottom-0 left-0 right-0 flex justify-center items-center h-[60px] bg-gradient-to-t from-darkPurple to-transparent z-50 space-x-4">
-          {/* Botón de Stop */}
-          <button
-            onClick={stopAndUnload}
-            className="bg-desertWarmOrange text-white p-3 rounded-full shadow-lg hover:bg-desertWarmOrange/90 transition-colors duration-200 flex items-center justify-center"
-            aria-label="Detener reproducción"
-          >
-            <StopIcon size={28} />
-          </button>
-          {/* Botón de Siguiente */}
-          <button
-            onClick={skipToNextVerse}
-            className="bg-desertWarmOrange text-white p-3 rounded-full shadow-lg hover:bg-desertWarmOrange/90 transition-colors duration-200 flex items-center justify-center"
-            aria-label="Siguiente verso"
-          >
-            <SkipIcon size={28} />
-          </button>
-        </div>
-      )}
-
-      {/* Pasar la prop hidden al BottomNavigation */}
-      <BottomNavigation activeTab="reader" hidden={$audioActive} />
+      {/* Añadir el popup de controles de audio */}
+      <AudioControlsPopup
+        isVisible={$audioActive && (isPlaying || (!!currentVerseKey && !isLoadingAudio && !audioError))}
+        onStop={stopAndUnload}
+        onSkip={skipToNextVerse}
+        currentSurahName={surah?.englishName}
+        currentSurahNumber={surah?.number}
+        currentVerseNumber={currentVerse?.numberInSurah}
+        totalVerses={surah?.numberOfAyahs}
+      />
     </div>
   );
 };
