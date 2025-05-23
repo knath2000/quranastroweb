@@ -1,7 +1,7 @@
 import type { Verse, ApiError, Surah } from '../types/quran';
 
 // The API base URL is hardcoded to match the quranexpo2 native app
-const API_BASE_URL = 'https://onlyquranexpo.vercel.app';
+const API_BASE_URL = 'https://onlyquranexpo.vercel.app/api/v2';
 
 /**
  * Fetches the list of all Surahs from the API
@@ -11,7 +11,7 @@ const API_BASE_URL = 'https://onlyquranexpo.vercel.app';
 export async function fetchSurahList(): Promise<Surah[]> {
   try {
     // Use the metadata API endpoint from quranexpo2 native app
-    const response = await fetch(`${API_BASE_URL}/api/get-metadata?type=surah-list`);
+    const response = await fetch(`${API_BASE_URL}/get-metadata?type=surah-list`);
     
     // Handle non-OK responses
     if (!response.ok) {
@@ -81,46 +81,17 @@ export async function fetchVersesForSurah(
   translator: string = "en.yusufali"
 ): Promise<Verse[]> {
   try {
-    // Fetch Arabic verses
-    const arabicVersesResponse = await fetch(`${API_BASE_URL}/api/get-verses?surah=${surahId}`);
+    const response = await fetch(`${API_BASE_URL}/get-verses?surah=${surahId}`);
     
-    if (!arabicVersesResponse.ok) {
-      throw new Error(`API error: Failed to fetch Arabic verses for Surah ${surahId}. Status: ${arabicVersesResponse.status}`);
+    if (!response.ok) {
+      throw new Error(`API error: Failed to fetch verses for Surah ${surahId}. Status: ${response.status}`);
     }
     
-    const arabicVerses = await arabicVersesResponse.json();
+    const verses = await response.json();
     
-    if (!Array.isArray(arabicVerses)) {
-      throw new Error(`API returned invalid data structure for Arabic verses of Surah ${surahId}`);
+    if (!Array.isArray(verses)) {
+      throw new Error(`API returned invalid data structure for verses of Surah ${surahId}`);
     }
-    
-    // Fetch translations
-    const translationsResponse = await fetch(`${API_BASE_URL}/api/get-translation-verses?surah=${surahId}&translator=${translator}`);
-    
-    if (!translationsResponse.ok) {
-      throw new Error(`API error: Failed to fetch translations for Surah ${surahId}. Status: ${translationsResponse.status}`);
-    }
-    
-    const translationObjects = await translationsResponse.json();
-    
-    if (!Array.isArray(translationObjects)) {
-      throw new Error(`API returned invalid data structure for translations of Surah ${surahId}`);
-    }
-    
-    // Create a map of translations by verse number for quick lookup
-    const translationsMap = translationObjects.reduce((map, verse) => {
-      map[verse.numberInSurah] = verse.translation;
-      return map;
-    }, {} as Record<number, string | undefined>);
-    
-    // Merge Arabic verses with translations
-    const verses = arabicVerses.map(verse => ({
-      id: verse.id,
-      surahId: verse.surahId,
-      numberInSurah: verse.numberInSurah,
-      text: verse.text,
-      translation: translationsMap[verse.numberInSurah] || ''
-    }));
     
     return verses;
   } catch (error) {
@@ -145,7 +116,7 @@ export async function fetchSingleTranslatedVerse(
   try {
     // Use the same API endpoint as quranexpo2 native app
     const response = await fetch(
-      `${API_BASE_URL}/api/get-translated-verse?surah=${surahId}&ayah=${ayahId}&translator=${translator}`
+      `${API_BASE_URL}/get-translated-verse?surah=${surahId}&ayah=${ayahId}&translator=${translator}`
     );
     
     // Handle non-OK responses

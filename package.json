@@ -16,6 +16,7 @@
     "@nanostores/preact": "^1.0.0",
     "@tanstack/react-virtual": "^3.13.9",
     "astro": "^5.7.13",
+    "lucide-preact": "^0.511.0",
     "nanostores": "^1.0.1",
     "preact": "^10.26.6",
     "react": "^19.1.0",

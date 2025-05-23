@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useEffect, useState, useMemo } from 'preact/hooks'; // Importar useMemo
+import { useEffect, useState, useMemo } from 'preact/hooks';
 import { fetchSurahById, fetchVersesForSurah } from '../services/apiClient';
 import type { Surah, Verse } from '../types/quran';
 import ReaderSurahHeader from './ReaderSurahHeader';
@@ -8,7 +8,8 @@ import { useVersePlayer } from '../hooks/useVersePlayer';
 import { getVerseKey } from '../utils/audioUtils';
 import { useStore } from '@nanostores/preact';
 import { showTranslation, audioActive } from '../stores/settingsStore';
-import AudioControlsPopup from './AudioControlsPopup';
+import BottomControlPanel from './BottomControlPanel';
+import { usePagination } from '../hooks/usePagination'; // Importar usePagination
 
 interface ReaderContainerProps {
   surahId: number;
@@ -37,7 +38,7 @@ const ReaderContainer = ({ surahId }: ReaderContainerProps) => {
     skipToNextVerse,
     onSeekChange,
     playVerse,
-  } = useVersePlayer(verses);
+  } = useVersePlayer(verses); // Pasar todos los versos al hook de audio
 
   const isPlaying = status === 'playing';
   const isLoadingAudio = status === 'loading';
@@ -46,8 +47,22 @@ const ReaderContainer = ({ surahId }: ReaderContainerProps) => {
   // Obtener el verso actual de forma segura usando useMemo
   const currentVerse = useMemo(() => {
     if (!verses || !currentVerseKey) return null;
-    return verses.find(v => getVerseKey(v.surahId, v.numberInSurah) === currentVerseKey);
+    return verses.find((v: Verse) => getVerseKey(v.surahId, v.numberInSurah) === currentVerseKey);
   }, [verses, currentVerseKey]);
+
+  // Hook de paginación
+  const {
+    currentPage,
+    totalPages,
+    versesPerPage,
+    currentVerses, // Versos de la página actual
+    firstVerseIndex,
+    lastVerseIndex,
+    goToPage,
+    goToNextPage,
+    goToPreviousPage,
+    totalVerses: totalVersesCount, // Renombrar para evitar conflicto con surah.numberOfAyahs
+  } = usePagination(verses); // Pasar todos los versos al hook de paginación
 
   useEffect(() => {
     const loadData = async () => {
@@ -95,7 +110,8 @@ const ReaderContainer = ({ surahId }: ReaderContainerProps) => {
     console.log('Handling audio toggle for verse:', verse.surahId, verse.numberInSurah);
     
     // Find the index of the verse being played and set it in the hook
-    const index = verses.findIndex(v =>
+    // Usar el array completo de versos para encontrar el índice global
+    const index = verses.findIndex((v: Verse) =>
       v.surahId === verse.surahId && v.numberInSurah === verse.numberInSurah
     );
 
@@ -180,11 +196,11 @@ const ReaderContainer = ({ surahId }: ReaderContainerProps) => {
   return (
     <div className="w-full flex flex-col relative h-full">
       {/* Scrollable container for verses */}
-      <div className="absolute inset-x-0 top-0 overflow-y-auto space-y-4 z-10 bottom-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <div className="absolute inset-x-0 top-0 overflow-y-auto space-y-4 z-10 pb-40" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         <div className="opacity-0 animate-fade-in animation-delay-[100ms]">
           <ReaderSurahHeader surah={surah} />
         </div>
-        {verses.map((verse, index) => {
+        {currentVerses.map((verse: Verse, index: number) => { // Usar currentVerses para renderizar
           const verseKey = getVerseKey(verse.surahId, verse.numberInSurah);
           const isActiveAudio = currentVerseKey === verseKey;
 
@@ -209,15 +225,19 @@ const ReaderContainer = ({ surahId }: ReaderContainerProps) => {
         {/* Extra padding at the bottom to ensure last item is fully visible */}
         <div className="h-4"></div>
       </div>
-      {/* Añadir el popup de controles de audio */}
-      <AudioControlsPopup
-        isVisible={$audioActive && (isPlaying || (!!currentVerseKey && !isLoadingAudio && !audioError))}
+      {/* Panel de control inferior combinado (audio y paginación) */}
+      <BottomControlPanel
+        isAudioActive={$audioActive && (isPlaying || (!!currentVerseKey && !isLoadingAudio && !audioError))}
         onStop={stopAndUnload}
         onSkip={skipToNextVerse}
         currentSurahName={surah?.englishName}
         currentSurahNumber={surah?.number}
         currentVerseNumber={currentVerse?.numberInSurah}
         totalVerses={surah?.numberOfAyahs}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        goToPreviousPage={goToPreviousPage}
+        goToNextPage={goToNextPage}
       />
     </div>
   );
